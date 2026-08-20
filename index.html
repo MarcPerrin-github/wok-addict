@@ -270,7 +270,8 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
 .vt-allergen-note{ font-size:.85rem; opacity:.8; margin-top:1em; line-height:1.5; }
 .vt-allergen-note--footer{ margin-top:.5em; }
 .vt-allergen-intro{ font-size:.9rem; opacity:.85; line-height:1.6; max-width:640px; }
-.vt-allergen-table{ width:100%; max-width:640px; border-collapse:collapse; margin:1.25em 0 0; font-size:.9rem; }
+.vt-allergen-table-wrap{ max-width:640px; overflow-x:auto; margin:1.25em 0 0; }
+.vt-allergen-table{ width:100%; min-width:360px; border-collapse:collapse; font-size:.9rem; }
 .vt-allergen-table th, .vt-allergen-table td{ text-align:left; padding:.5em .75em .5em 0; border-bottom:1px dashed currentColor; }
 .vt-allergen-table th{ font-weight:600; opacity:.75; font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
 .vt-allergen-none{ opacity:.7; }
@@ -436,12 +437,14 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
       Détail par plat ci-dessous — renseignez-vous auprès du personnel pour toute
       allergie ou intolérance alimentaire.
     </p>
-    <table id="vt-allergen-table" class="vt-allergen-table" hidden>
-      <thead>
-        <tr><th scope="col">Plat</th><th scope="col">Allergènes</th></tr>
-      </thead>
-      <tbody id="vt-allergen-table-body"></tbody>
-    </table>
+    <div class="vt-allergen-table-wrap" id="vt-allergen-table-wrap" hidden>
+      <table id="vt-allergen-table" class="vt-allergen-table">
+        <thead>
+          <tr><th scope="col">Plat</th><th scope="col">Allergènes</th></tr>
+        </thead>
+        <tbody id="vt-allergen-table-body"></tbody>
+      </table>
+    </div>
     <p id="vt-allergen-empty" class="vt-allergen-empty">
       Le détail des allergènes par plat n'est pas encore renseigné pour ce menu —
       merci de vous renseigner auprès du personnel.
@@ -688,11 +691,11 @@ function renderMenu(items){
 
 /* ---------- Rendu de la liste des allergènes par plat ---------- */
 function renderAllergenList(dishes){
-  const table = document.getElementById('vt-allergen-table');
+  const wrap = document.getElementById('vt-allergen-table-wrap');
   const tbody = document.getElementById('vt-allergen-table-body');
   const empty = document.getElementById('vt-allergen-empty');
-  if (!table || !tbody || !empty) return;
-  if (!dishes || !dishes.length){ table.hidden = true; empty.hidden = false; return; }
+  if (!wrap || !tbody || !empty) return;
+  if (!dishes || !dishes.length){ wrap.hidden = true; empty.hidden = false; return; }
   tbody.innerHTML = '';
   dishes.forEach(function(d){
     const tr = document.createElement('tr');
@@ -709,7 +712,7 @@ function renderAllergenList(dishes){
     tr.appendChild(tdName); tr.appendChild(tdAllergenes);
     tbody.appendChild(tr);
   });
-  table.hidden = false;
+  wrap.hidden = false;
   empty.hidden = true;
 }
 
