@@ -135,8 +135,11 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
 .nav-links a:hover{ opacity:1; }
 .nav .btn{ padding:.6em 1.1em; font-size:.92rem; }
 .vt-nav-toggle{ display:none; background:none; border:0; font-size:1.5rem; line-height:1; cursor:pointer; color:#fff; }
+.nav-cta-compact{ display:none; }
 @media (max-width:880px){
   .nav-links{ display:none; }
+  .nav-cta-full{ display:none; }
+  .nav-cta-compact{ display:inline-flex; padding:.55em .7em; font-size:1.1rem; }
   .vt-nav-toggle{ display:inline-flex; align-items:center; justify-content:center; }
   #nav-links.vt-nav-open{ display:flex; flex-direction:column; }
 }
@@ -301,7 +304,8 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
     <a href="#signature">Le plat-signature</a>
     <a href="#infos">Infos &amp; accès</a>
   </div>
-  <a class="btn btn--dark" href="https://deliveroo.fr/fr/menu/paris/9eme-opera/wok-addict" target="_blank" rel="noopener">Commander&nbsp;↗</a>
+  <a class="btn btn--dark nav-cta-full" href="https://deliveroo.fr/fr/menu/paris/9eme-opera/wok-addict" target="_blank" rel="noopener">Commander&nbsp;↗</a>
+  <a class="btn btn--dark nav-cta-compact" href="https://deliveroo.fr/fr/menu/paris/9eme-opera/wok-addict" target="_blank" rel="noopener" aria-label="Commander sur Deliveroo">🛍️</a>
 </nav>
 
 <main id="main-content">
