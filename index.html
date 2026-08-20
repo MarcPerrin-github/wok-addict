@@ -270,10 +270,10 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
 .vt-allergen-note{ font-size:.85rem; opacity:.8; margin-top:1em; line-height:1.5; }
 .vt-allergen-note--footer{ margin-top:.5em; }
 .vt-allergen-intro{ font-size:.9rem; opacity:.85; line-height:1.6; max-width:640px; }
-.vt-allergen-list{ list-style:none; padding:0; margin:1.25em 0 0; display:grid; gap:.5em; max-width:640px; }
-.vt-allergen-list li{ display:flex; justify-content:space-between; gap:1em; padding:.5em 0; border-bottom:1px dashed currentColor; }
-.vt-allergen-list li span:first-child{ font-weight:600; }
-.vt-allergen-list li span:last-child{ text-align:right; }
+.vt-allergen-table{ width:100%; max-width:640px; border-collapse:collapse; margin:1.25em 0 0; font-size:.9rem; }
+.vt-allergen-table th, .vt-allergen-table td{ text-align:left; padding:.5em .75em .5em 0; border-bottom:1px dashed currentColor; }
+.vt-allergen-table th{ font-weight:600; opacity:.75; font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
+.vt-allergen-none{ opacity:.7; }
 .vt-allergen-empty{ font-size:.9rem; opacity:.75; margin-top:1.25em; }
 .vt-allergen-link{
   display:inline-block; margin-top:1em; padding:.5em 1.1em;
@@ -436,7 +436,12 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
       Détail par plat ci-dessous — renseignez-vous auprès du personnel pour toute
       allergie ou intolérance alimentaire.
     </p>
-    <ul id="vt-allergen-list" class="vt-allergen-list" hidden></ul>
+    <table id="vt-allergen-table" class="vt-allergen-table" hidden>
+      <thead>
+        <tr><th scope="col">Plat</th><th scope="col">Allergènes</th></tr>
+      </thead>
+      <tbody id="vt-allergen-table-body"></tbody>
+    </table>
     <p id="vt-allergen-empty" class="vt-allergen-empty">
       Le détail des allergènes par plat n'est pas encore renseigné pour ce menu —
       merci de vous renseigner auprès du personnel.
@@ -631,10 +636,9 @@ function renderMenu(items){
     const cat = it.categorie || it['catégorie'] || 'Autres';
     if (!map[cat]){ map[cat]=[]; cats.push(cat); }
     map[cat].push(it);
+    const name = it.nom || it.name || '';
     const allergenes = (it.allergenes || it['allergènes'] || '').trim();
-    if (allergenes){
-      allergenDishes.push({ name: it.nom || it.name || '', allergenes });
-    }
+    if (name) allergenDishes.push({ name, allergenes });
   });
   if (!cats.length) return false;
 
@@ -684,19 +688,28 @@ function renderMenu(items){
 
 /* ---------- Rendu de la liste des allergènes par plat ---------- */
 function renderAllergenList(dishes){
-  const list = document.getElementById('vt-allergen-list');
+  const table = document.getElementById('vt-allergen-table');
+  const tbody = document.getElementById('vt-allergen-table-body');
   const empty = document.getElementById('vt-allergen-empty');
-  if (!list || !empty) return;
-  if (!dishes || !dishes.length){ list.hidden = true; empty.hidden = false; return; }
-  list.innerHTML = '';
+  if (!table || !tbody || !empty) return;
+  if (!dishes || !dishes.length){ table.hidden = true; empty.hidden = false; return; }
+  tbody.innerHTML = '';
   dishes.forEach(function(d){
-    const li = document.createElement('li');
-    const nm = document.createElement('span'); nm.textContent = d.name;
-    const al = document.createElement('span'); al.textContent = d.allergenes;
-    li.appendChild(nm); li.appendChild(al);
-    list.appendChild(li);
+    const tr = document.createElement('tr');
+    const tdName = document.createElement('td'); tdName.textContent = d.name;
+    const tdAllergenes = document.createElement('td');
+    if (d.allergenes) {
+      tdAllergenes.textContent = d.allergenes;
+    } else {
+      const span = document.createElement('span');
+      span.className = 'vt-allergen-none';
+      span.textContent = '✓ Aucun';
+      tdAllergenes.appendChild(span);
+    }
+    tr.appendChild(tdName); tr.appendChild(tdAllergenes);
+    tbody.appendChild(tr);
   });
-  list.hidden = false;
+  table.hidden = false;
   empty.hidden = true;
 }
 
