@@ -269,6 +269,20 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
 .vt-data-fallback-banner{ background:#fff3cd; color:#664d03; border:1px solid #ffe69c; padding:.75em 1em; border-radius:6px; margin:0 0 1.5em; font-size:.95rem; }
 .vt-allergen-note{ font-size:.85rem; opacity:.8; margin-top:1em; line-height:1.5; }
 .vt-allergen-note--footer{ margin-top:.5em; }
+.vt-allergen-intro{ font-size:.9rem; opacity:.85; line-height:1.6; max-width:640px; }
+.vt-allergen-list{ list-style:none; padding:0; margin:1.25em 0 0; display:grid; gap:.5em; max-width:640px; }
+.vt-allergen-list li{ display:flex; justify-content:space-between; gap:1em; padding:.5em 0; border-bottom:1px dashed currentColor; }
+.vt-allergen-list li span:first-child{ font-weight:600; }
+.vt-allergen-list li span:last-child{ text-align:right; }
+.vt-allergen-empty{ font-size:.9rem; opacity:.75; margin-top:1.25em; }
+.vt-allergen-link{
+  display:inline-block; margin-top:1em; padding:.5em 1.1em;
+  border:1px solid currentColor; border-radius:999px;
+  color:inherit; text-decoration:none; font-size:.85rem; font-weight:600;
+  background:transparent; opacity:.85;
+}
+.vt-allergen-link:hover{ opacity:1; }
+.vt-allergen-note a{ color:inherit; text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -407,7 +421,26 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
     </div>
 
     <p class="menu-note">Tous les plats se déclinent <strong>poulet, bœuf, crevettes ou végétarien</strong>. Prix confirmés via Deliveroo (carte de livraison) ; la carte sur place peut être plus large. Les mentions <span class="tag">à compléter</span> attendent vos infos exactes (plat du jour, formules, desserts, boissons).</p>
-    <p class="vt-allergen-note">Nos plats peuvent contenir des traces des 14 allergènes réglementés par l'UE (gluten, crustacés, œufs, poissons, arachides, soja, lait, fruits à coque, céleri, moutarde, graines de sésame, sulfites, lupin, mollusques). Renseignez-vous auprès du personnel pour toute allergie ou intolérance alimentaire.</p>
+    <a class="vt-allergen-link" href="#allergenes">Voir les allergènes par plat →</a>
+  </div>
+</section>
+
+<!-- ====================== ALLERGÈNES ====================== -->
+<section class="section" id="allergenes" aria-labelledby="allergenes-heading">
+  <div class="wrap">
+    <h2 id="allergenes-heading">Allergènes</h2>
+    <p class="vt-allergen-intro">
+      Nos plats peuvent contenir des traces des 14 allergènes réglementés par l'UE
+      (gluten, crustacés, œufs, poissons, arachides, soja, lait, fruits à coque,
+      céleri, moutarde, graines de sésame, sulfites, lupin, mollusques).
+      Détail par plat ci-dessous — renseignez-vous auprès du personnel pour toute
+      allergie ou intolérance alimentaire.
+    </p>
+    <ul id="vt-allergen-list" class="vt-allergen-list" hidden></ul>
+    <p id="vt-allergen-empty" class="vt-allergen-empty">
+      Le détail des allergènes par plat n'est pas encore renseigné pour ce menu —
+      merci de vous renseigner auprès du personnel.
+    </p>
   </div>
 </section>
 
@@ -488,7 +521,9 @@ a:focus-visible,button:focus-visible,.tab:focus-visible{ outline:3px solid var(-
         <a href="https://www.tripadvisor.fr/Restaurant_Review-g187147-d7820481-Reviews-Wok_Addict-Paris_Ile_de_France.html" target="_blank" rel="noopener">TripAdvisor</a>
       </div>
     </div>
-    <p class="vt-allergen-note vt-allergen-note--footer">Allergènes : liste des 14 allergènes UE disponible sur demande auprès du personnel.</p>
+    <p class="vt-allergen-note vt-allergen-note--footer">
+      <a href="#allergenes">Allergènes : détail par plat</a>
+    </p>
   </div>
 </footer>
 
@@ -591,10 +626,15 @@ async function loadCSV(url){
 /* ---------- Rendu du menu (onglets = catégories, dans l'ordre du Sheet) ---------- */
 function renderMenu(items){
   const cats=[], map={};
+  const allergenDishes=[];
   items.forEach(it=>{
     const cat = it.categorie || it['catégorie'] || 'Autres';
     if (!map[cat]){ map[cat]=[]; cats.push(cat); }
     map[cat].push(it);
+    const allergenes = (it.allergenes || it['allergènes'] || '').trim();
+    if (allergenes){
+      allergenDishes.push({ name: it.nom || it.name || '', allergenes });
+    }
   });
   if (!cats.length) return false;
 
@@ -637,8 +677,27 @@ function renderMenu(items){
     });
     panelsEl.appendChild(panel);
   });
+  renderAllergenList(allergenDishes);
   bindTabs();
   return true;
+}
+
+/* ---------- Rendu de la liste des allergènes par plat ---------- */
+function renderAllergenList(dishes){
+  const list = document.getElementById('vt-allergen-list');
+  const empty = document.getElementById('vt-allergen-empty');
+  if (!list || !empty) return;
+  if (!dishes || !dishes.length){ list.hidden = true; empty.hidden = false; return; }
+  list.innerHTML = '';
+  dishes.forEach(function(d){
+    const li = document.createElement('li');
+    const nm = document.createElement('span'); nm.textContent = d.name;
+    const al = document.createElement('span'); al.textContent = d.allergenes;
+    li.appendChild(nm); li.appendChild(al);
+    list.appendChild(li);
+  });
+  list.hidden = false;
+  empty.hidden = true;
 }
 
 /* ---------- Rendu des horaires ---------- */
